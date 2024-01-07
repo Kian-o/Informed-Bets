@@ -8,7 +8,7 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 sport = 'americanfootball_nfl'
-api_key = 'YOUR_API_KEY'
+api_key = '0fd2e16c8b08df43c7c557f0384da54a'
 response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?apiKey={api_key}&regions=us&oddsFormat=american")
 json_data = response.json()
 
@@ -42,10 +42,11 @@ CREATE TABLE IF NOT EXISTS bookmakers (
 '''
 cursor.execute(create_game_odds_query)
 cursor.execute(create_bookmakers_query)
+cursor.execute('DELETE FROM game_odds')
+cursor.execute('DELETE FROM bookmakers')
 conn.commit()
 
 # Insert game information into game_odds table
-
 # Check if the response is a list
 if isinstance(json_data, list):
     for data in json_data:
@@ -67,22 +68,23 @@ conn.commit()
 
 # Insert bookmaker information into bookmakers table
 # Insert bookmaker information into bookmakers table
-for bookmaker in json_data['bookmakers']:
-    for market in bookmaker['markets']:
-        for outcome in market['outcomes']:
-            cursor.execute('''
-                INSERT INTO bookmakers (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                json_data['id'],
-                bookmaker['key'],
-                bookmaker['title'],
-                bookmaker['last_update'],
-                market['key'],
-                market['last_update'],
-                outcome['name'],
-                outcome['price'],
-            ))
+for item in json_data:
+    for bookmaker in item['bookmakers']:
+        for market in bookmaker['markets']:
+            for outcome in market['outcomes']:
+                cursor.execute('''
+                    INSERT INTO bookmakers (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    item['id'],
+                    bookmaker['key'],
+                    bookmaker['title'],
+                    bookmaker['last_update'],
+                    market['key'],
+                    market['last_update'],
+                    outcome['name'],
+                    outcome['price'],
+                ))
 
 # Commit changes and close the connection
 conn.commit()

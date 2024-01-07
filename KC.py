@@ -10,7 +10,7 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # Create a table for Kelly Criterion results
-create_table_query = '''
+create_kelly_criterion_results_query = '''
 CREATE TABLE IF NOT EXISTS kelly_criterion_results (
     game_id INTEGER PRIMARY KEY,
     bookmaker_id INTEGER,
@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS kelly_criterion_results (
     recommended_wager REAL
 );
 '''
-cursor.execute(create_table_query)
+cursor.execute('DELETE FROM kelly_criterion_results')
+cursor.execute(create_kelly_criterion_results_query)
 
 # Commit the changes to the database
 conn.commit()

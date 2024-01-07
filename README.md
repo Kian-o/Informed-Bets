@@ -21,6 +21,25 @@ Data for the program is sourced from [the-odds-api](https://the-odds-api.com), w
 3. probability.py
 4. KC.py
 
+**SQL for Results**
+
+```sql
+SELECT 
+    kcr.probability,
+    kcr.recommended_wager,
+    bms.bookmaker_title,
+    gos.sport_title,
+    gos.commence_time,
+    bms.outcome_name,
+    bms.last_update,
+    gos.home_team,
+    gos.away_team
+FROM kelly_criterion_results kcr
+JOIN bookmakers bms ON kcr.game_id = bms.game_id
+JOIN game_odds gos ON kcr.game_id = gos.id
+ORDER BY kcr.recommended_wager DESC, bms.last_update DESC;
+```
+
 # Gambling Disclaimer
 
 This website/application provides information and resources related to gambling, including odds, probabilities, and betting strategies. It is important to note that gambling involves risk, and individuals should exercise caution and responsible judgment when participating in any form of betting or gaming activities.

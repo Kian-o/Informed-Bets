@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS probability (
 );
 '''
 cursor.execute(create_table_query)
+cursor.execute('DELETE FROM probability')
 conn.commit()
 
 # Insert results into probability table
