@@ -5,6 +5,27 @@ db_path = os.path.expanduser("~/Documents/Kelly Criterion.sqlite")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
+# Create a table for probability results
+create_table_query = '''
+CREATE TABLE IF NOT EXISTS probability (
+    game_id            TEXT    PRIMARY KEY,
+    bookmaker_id       INTEGER ,
+    probability        INTEGER ,
+    odds               INTEGER ,
+    bookmaker_title    TEXT    ,
+    market_key         TEXT    ,
+    outcome_name       TEXT    ,
+    last_update        TEXT    ,
+    market_last_update TEXT    ,
+    home_team          TEXT    ,
+    away_team          TEXT    ,
+    FOREIGN KEY (game_id) REFERENCES game_odds(id)
+);
+'''
+cursor.execute(create_table_query)
+conn.commit()
+
+# Insert results into probability table
 query = ('''INSERT OR REPLACE INTO probability (
     game_id,
     bookmaker_id,

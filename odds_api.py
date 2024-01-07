@@ -12,6 +12,20 @@ api_key = 'YOUR_API_KEY'
 response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?apiKey={api_key}&regions=us&oddsFormat=american")
 json_data = response.json()
 
+# Create a table for Game Odds results
+create_table_query = '''
+CREATE TABLE IF NOT EXISTS game_odds (
+    id            TEXT PRIMARY KEY,
+    sport_key     TEXT ,
+    sport_title   TEXT ,
+    commence_time TEXT ,
+    home_team     TEXT ,
+    away_team     TEXT 
+);
+'''
+cursor.execute(create_table_query)
+conn.commit()
+
 # Insert game information into game_odds table
 
 cursor.execute('''
@@ -27,6 +41,26 @@ cursor.execute('''
 ))
 
 # Commit changes to the database
+conn.commit()
+
+# Create a table for Bookmaker results
+create_table_query = '''
+CREATE TABLE IF NOT EXISTS bookmakers (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id             TEXT    ,
+    bookmaker_key       TEXT    ,
+    bookmaker_title     TEXT    ,
+    last_update         TEXT    ,
+    market_key          TEXT    ,
+    market_last_update  TEXT    ,
+    outcome_name        TEXT    ,
+    outcome_price       INTEGER ,
+    outcome_description text    ,
+    outcome_point       integer ,
+    FOREIGN KEY (game_id) REFERENCES game_odds(id)
+);
+'''
+cursor.execute(create_table_query)
 conn.commit()
 
 # Insert bookmaker information into bookmakers table

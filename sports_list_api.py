@@ -10,8 +10,24 @@ json_file_path = response.json()
 
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
+
+# Create table for sports_list results
+create_table_query = '''
+CREATE TABLE IF NOT EXISTS sports_list (
+    sport         TEXT PRIMARY KEY,
+    region_group  TEXT ,
+    title         TEXT ,
+    description   TEXT ,
+    active        TEXT ,
+    has_outrights TEXT
+);
+'''
+cursor.execute(create_table_query)
+conn.commit()
+
 cursor.execute('DELETE FROM sports_list')
 
+# Insert sports list results into sports_list table
 for entry in json_file_path:
     cursor.execute('''
         INSERT INTO sports_list (sport, region_group, title, description, active, has_outrights)
@@ -20,4 +36,3 @@ for entry in json_file_path:
 
 conn.commit()
 conn.close()
-
