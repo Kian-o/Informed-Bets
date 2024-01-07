@@ -3,8 +3,9 @@ import sqlite3
 import requests
 
 db_path = os.path.expanduser("~/Documents/Kelly Criterion.sqlite")
+api_key = 'YOUR_API_KEY'
 
-response = requests.get(url="https://api.the-odds-api.com/v4/sports?apiKey=0fd2e16c8b08df43c7c557f0384da54a")
+response = requests.get(url=f"https://api.the-odds-api.com/v4/sports?apiKey={api_key}")
 json_file_path = response.json()
 
 conn = sqlite3.connect(db_path)
