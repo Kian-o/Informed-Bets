@@ -13,7 +13,7 @@ response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odd
 json_data = response.json()
 
 # Create a table for Game Odds results
-create_table_query = '''
+create_game_odds_query = '''
 CREATE TABLE IF NOT EXISTS game_odds (
     id            TEXT PRIMARY KEY,
     sport_key     TEXT ,
@@ -23,28 +23,8 @@ CREATE TABLE IF NOT EXISTS game_odds (
     away_team     TEXT 
 );
 '''
-cursor.execute(create_table_query)
-conn.commit()
-
-# Insert game information into game_odds table
-
-cursor.execute('''
-    INSERT INTO game_odds (id, sport_key, sport_title, commence_time, home_team, away_team)
-    VALUES (?, ?, ?, ?, ?, ?)
-''', (
-    json_data['id'],
-    json_data['sport_key'],
-    json_data['sport_title'],
-    json_data['commence_time'],
-    json_data['home_team'],
-    json_data['away_team']
-))
-
-# Commit changes to the database
-conn.commit()
-
 # Create a table for Bookmaker results
-create_table_query = '''
+create_bookmakers_query = '''
 CREATE TABLE IF NOT EXISTS bookmakers (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     game_id             TEXT    ,
@@ -60,9 +40,32 @@ CREATE TABLE IF NOT EXISTS bookmakers (
     FOREIGN KEY (game_id) REFERENCES game_odds(id)
 );
 '''
-cursor.execute(create_table_query)
+cursor.execute(create_game_odds_query)
+cursor.execute(create_bookmakers_query)
 conn.commit()
 
+# Insert game information into game_odds table
+
+# Check if the response is a list
+if isinstance(json_data, list):
+    for data in json_data:
+        # Insert game information into game_odds table
+        cursor.execute('''
+            INSERT INTO game_odds (id, sport_key, sport_title, commence_time, home_team, away_team)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            data['id'],
+            data['sport_key'],
+            data['sport_title'],
+            data['commence_time'],
+            data['home_team'],
+            data['away_team']
+        ))
+
+# Commit changes to the database
+conn.commit()
+
+# Insert bookmaker information into bookmakers table
 # Insert bookmaker information into bookmakers table
 for bookmaker in json_data['bookmakers']:
     for market in bookmaker['markets']:
@@ -79,7 +82,6 @@ for bookmaker in json_data['bookmakers']:
                 market['last_update'],
                 outcome['name'],
                 outcome['price'],
-
             ))
 
 # Commit changes and close the connection
