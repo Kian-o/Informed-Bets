@@ -14,11 +14,12 @@ Informed Bets employs the [Kelly Criterion](https://www.techopedia.com/gambling-
 
 Data for the program is sourced from [the-odds-api](https://the-odds-api.com), which offers various access plans. A free subscription allows for 500 requests per month.
 
+**Run Order:**
 
-
-
-
-
+1. sports_list_api.py
+2. odds_api.py
+3. probability.py
+4. KC.py
 
 # Gambling Disclaimer
 
