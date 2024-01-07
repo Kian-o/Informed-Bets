@@ -13,6 +13,7 @@ response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odd
 json_data = response.json()
 
 # Insert game information into game_odds table
+
 cursor.execute('''
     INSERT INTO game_odds (id, sport_key, sport_title, commence_time, home_team, away_team)
     VALUES (?, ?, ?, ?, ?, ?)
