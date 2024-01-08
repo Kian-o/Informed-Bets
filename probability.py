@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS probability (
     market_last_update TEXT    ,
     home_team          TEXT    ,
     away_team          TEXT    ,
-    FOREIGN KEY (game_id) REFERENCES game_odds(id)
+    FOREIGN KEY (game_id) REFERENCES game_odds_staging(id)
 );
 '''
 cursor.execute(create_table_query)
@@ -53,9 +53,9 @@ SELECT
     gos.home_team,
     gos.away_team
 FROM
-    bookmakers bmr
+    bookmakers_staging bmr
 JOIN
-    game_odds gos ON bmr.game_id = gos.id
+    game_odds_staging gos ON bmr.game_id = gos.id
 ORDER BY
     last_update DESC;
 ''')
