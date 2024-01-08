@@ -3,7 +3,7 @@ import sqlite3
 from Functions_combined import update_sports_list, update_game_odds, calculate_and_update_kelly_criterion
 
 # Example usage
-api_key = '0fd2e16c8b08df43c7c557f0384da54a'
+api_key = 'YOUR_API_KEY'
 db_path = os.path.expanduser("~/Documents/Kelly Criterion.sqlite")
 sport = 'americanfootball_nfl'
 bankroll = 10
