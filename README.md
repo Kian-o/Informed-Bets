@@ -24,20 +24,16 @@ Data for the program is sourced from [the-odds-api](https://the-odds-api.com), w
 **SQL for Results**
 
 ```sql
-SELECT 
-    kcr.probability,
-    kcr.recommended_wager,
-    bms.bookmaker_title,
-    gos.sport_title,
-    gos.commence_time,
-    bms.outcome_name,
-    bms.last_update,
-    gos.home_team,
-    gos.away_team
-FROM kelly_criterion_results kcr
-JOIN bookmakers bms ON kcr.game_id = bms.game_id
-JOIN game_odds gos ON kcr.game_id = gos.id
-ORDER BY kcr.recommended_wager DESC, bms.last_update DESC;
+select 
+kcr.*
+, bms.* 
+
+from kelly_criterion_results kcr
+
+join bookmakers_staging bms
+on kcr.bookmaker_id = bms.id
+
+
 ```
 
 # Gambling Disclaimer
