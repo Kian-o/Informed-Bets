@@ -29,24 +29,18 @@ kcr. bookmaker_id
 , kcr.odds
 , kcr.probability
 , kcr.recommended_wager
-, sss.spread_point
-, sss.spread_price
 , bms.bookmaker_title
 , bms.last_update
 , bms.outcome_name
 , bms.outcome_price
+, bms.outcome_point
 
 from "kelly_criterion_results" kcr
 
 join "bookmakers_staging" bms
 on kcr.bookmaker_id = bms.id
 
-join spreads_staging sss
-on kcr.bookmaker_id = sss.bookmaker_id
-
 order by kcr.recommended_wager desc
-
-
 ```
 
 # Gambling Disclaimer

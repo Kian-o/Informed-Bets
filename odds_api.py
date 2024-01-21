@@ -8,8 +8,8 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 sport = 'americanfootball_nfl'
-api_key = 'YOUR API KEY'
-response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?apiKey={api_key}&regions=us&oddsFormat=american")
+api_key = '0fd2e16c8b08df43c7c557f0384da54a'
+response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?markets=spreads&apiKey={api_key}&regions=us&oddsFormat=american")
 json_data = response.json()
 
 # Create a table for Game Odds results
@@ -73,8 +73,8 @@ for item in json_data:
         for market in bookmaker['markets']:
             for outcome in market['outcomes']:
                 cursor.execute('''
-                    INSERT INTO bookmakers_staging (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO bookmakers_staging (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price, outcome_point)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     item['id'],
                     bookmaker['key'],
@@ -84,6 +84,7 @@ for item in json_data:
                     market['last_update'],
                     outcome['name'],
                     outcome['price'],
+                    outcome['point'],
                 ))
 
 # Commit changes and close the connection
