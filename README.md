@@ -25,13 +25,26 @@ Data for the program is sourced from [the-odds-api](https://the-odds-api.com), w
 
 ```sql
 select 
-kcr.*
-, bms.* 
+kcr. bookmaker_id
+, kcr.odds
+, kcr.probability
+, kcr.recommended_wager
+, sss.spread_point
+, sss.spread_price
+, bms.bookmaker_title
+, bms.last_update
+, bms.outcome_name
+, bms.outcome_price
 
-from kelly_criterion_results kcr
+from "kelly_criterion_results" kcr
 
-join bookmakers_staging bms
+join "bookmakers_staging" bms
 on kcr.bookmaker_id = bms.id
+
+join spreads_staging sss
+on kcr.bookmaker_id = sss.bookmaker_id
+
+order by kcr.recommended_wager desc
 
 
 ```
