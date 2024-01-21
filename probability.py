@@ -8,8 +8,7 @@ cursor = conn.cursor()
 # Create a table for probability results
 create_table_query = '''
 CREATE TABLE IF NOT EXISTS probability (
-    game_id            TEXT    PRIMARY KEY,
-    bookmaker_id       INTEGER ,
+    bookmaker_id       INTEGER    PRIMARY KEY,
     probability        INTEGER ,
     odds               INTEGER ,
     bookmaker_title    TEXT    ,
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS probability (
     market_last_update TEXT    ,
     home_team          TEXT    ,
     away_team          TEXT    ,
-    FOREIGN KEY (game_id) REFERENCES game_odds(id)
+    FOREIGN KEY (bookmaker_id) REFERENCES bookmakers_staging(id)
 );
 '''
 cursor.execute(create_table_query)
@@ -27,8 +26,7 @@ cursor.execute('DELETE FROM probability')
 conn.commit()
 
 # Insert results into probability table
-query = ('''INSERT OR REPLACE INTO probability (
-    game_id,
+query = ('''INSERT INTO probability (
     bookmaker_id,
     probability,
     odds,
@@ -41,7 +39,6 @@ query = ('''INSERT OR REPLACE INTO probability (
     away_team
 )
 SELECT
-    bmr.game_id,
     bmr.id as bookmaker_id,
     bmr.outcome_price / (bmr.outcome_price + 100) * 100 as probability,
     bmr.outcome_price as odds,
@@ -53,9 +50,9 @@ SELECT
     gos.home_team,
     gos.away_team
 FROM
-    bookmakers bmr
+    bookmakers_staging bmr
 JOIN
-    game_odds gos ON bmr.game_id = gos.id
+    game_odds_staging gos ON bmr.game_id = gos.id
 ORDER BY
     last_update DESC;
 ''')
