@@ -8,13 +8,13 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 sport = 'americanfootball_nfl'
-api_key = 'YOUR_API_KEY'
-response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?apiKey={api_key}&regions=us&oddsFormat=american")
+api_key = '0fd2e16c8b08df43c7c557f0384da54a'
+response = requests.get(url=f"https://api.the-odds-api.com/v4/sports/{sport}/odds?markets=spreads&apiKey={api_key}&regions=us&oddsFormat=american")
 json_data = response.json()
 
 # Create a table for Game Odds results
-create_game_odds_query = '''
-CREATE TABLE IF NOT EXISTS game_odds (
+create_game_odds_staging_query = '''
+CREATE TABLE IF NOT EXISTS game_odds_staging (
     id            TEXT PRIMARY KEY,
     sport_key     TEXT ,
     sport_title   TEXT ,
@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS game_odds (
 );
 '''
 # Create a table for Bookmaker results
-create_bookmakers_query = '''
-CREATE TABLE IF NOT EXISTS bookmakers (
+create_bookmakers_staging_query = '''
+CREATE TABLE IF NOT EXISTS bookmakers_staging (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     game_id             TEXT    ,
     bookmaker_key       TEXT    ,
@@ -37,13 +37,13 @@ CREATE TABLE IF NOT EXISTS bookmakers (
     outcome_price       INTEGER ,
     outcome_description text    ,
     outcome_point       integer ,
-    FOREIGN KEY (game_id) REFERENCES game_odds(id)
+    FOREIGN KEY (game_id) REFERENCES game_odds_staging(id)
 );
 '''
-cursor.execute(create_game_odds_query)
-cursor.execute(create_bookmakers_query)
-cursor.execute('DELETE FROM game_odds')
-cursor.execute('DELETE FROM bookmakers')
+cursor.execute(create_game_odds_staging_query)
+cursor.execute(create_bookmakers_staging_query)
+cursor.execute('DELETE FROM game_odds_staging')
+cursor.execute('DELETE FROM bookmakers_staging')
 conn.commit()
 
 # Insert game information into game_odds table
@@ -52,7 +52,7 @@ if isinstance(json_data, list):
     for data in json_data:
         # Insert game information into game_odds table
         cursor.execute('''
-            INSERT INTO game_odds (id, sport_key, sport_title, commence_time, home_team, away_team)
+            INSERT INTO game_odds_staging (id, sport_key, sport_title, commence_time, home_team, away_team)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', (
             data['id'],
@@ -73,8 +73,8 @@ for item in json_data:
         for market in bookmaker['markets']:
             for outcome in market['outcomes']:
                 cursor.execute('''
-                    INSERT INTO bookmakers (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO bookmakers_staging (game_id, bookmaker_key, bookmaker_title, last_update, market_key, market_last_update, outcome_name, outcome_price, outcome_point)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     item['id'],
                     bookmaker['key'],
@@ -84,6 +84,7 @@ for item in json_data:
                     market['last_update'],
                     outcome['name'],
                     outcome['price'],
+                    outcome['point'],
                 ))
 
 # Commit changes and close the connection
